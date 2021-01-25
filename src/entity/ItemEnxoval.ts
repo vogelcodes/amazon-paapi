@@ -1,26 +1,34 @@
-import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm'
-import {uuid} from 'uuidv4';
+import { Entity, Column, PrimaryGeneratedColumn, UpdateDateColumn, CreateDateColumn } from 'typeorm'
 
-@Entity('itemEnxoval')
-class ItemEnxoval {
+@Entity()
+export default class ItemEnxoval {
     @PrimaryGeneratedColumn('uuid')
     id: string;
-    @Column()
+    
+    @Column({
+        unique: true
+    })
     asin: string;
     @Column()
     name: string;
     @Column()
+    imageUrl: string;
+    @Column({default: "-"})
+    category: string;
+    @Column()
+    imageWidth: number;
+    @Column()
+    imageHeight: number;
+    @Column()
     price: number;
     @Column()
     available: boolean;
+    @CreateDateColumn()
+    createdAt: Date;
+    @UpdateDateColumn()
+    updatedAt: Date;
 
-    constructor (name: string, asin:string,  price: number  ) {
-        this.id = uuid();
-        this.name = name;
-        this.asin = asin;
-        this.price = price;
-    }
+    
 
 }
 
-export default ItemEnxoval;

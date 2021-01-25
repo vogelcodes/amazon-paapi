@@ -4,7 +4,6 @@ import routes from './routes';
 
 
 
-console.log(process.env);
 const app = express()
 
 app.use(express.json());

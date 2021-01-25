@@ -32,23 +32,47 @@ itemenxovalRouter.post('/', async (request,response)=>{
     try {
          result = await Lookup.getItems({
             ItemIds: asin,
-            Resources: ['Offers.Listings.Price', 'Images.Primary.Large', 'ItemInfo.Title']//will override the existing Resources if passed in the Request object 
+            Resources: ['Offers.Listings.Price', 'Images.Primary.Large', 'ItemInfo.Title', 'ItemInfo.Classifications']//will override the existing Resources if passed in the Request object 
         })
         
     } catch (error) {
          response.status(400).json({error});
     }
     
+    
     let items = [];
-    asin.forEach((asin) => {
-        const item = itemsRepository.create({asin, available: true, name: result.Items[asin].ItemInfo.Title.DisplayValue, price: result.Items[asin].Offers.Listings[0].Price.Amount});
+    for (let id of asin) {
+        let item = itemsRepository.create({
+            asin: id, 
+            available: true,
+            name: result.Items[id].ItemInfo.Title.DisplayValue,
+            category: result.Items[id].ItemInfo.Classifications.Binding.DisplayValue,
+            imageUrl: result.Items[id].Images.Primary.Large.URL,
+            imageHeight: result.Items[id].Images.Primary.Large.Height,
+            imageWidth: result.Items[id].Images.Primary.Large.Width,
+            price: result.Items[id].Offers.Listings[0].Price.Amount});
         items.push(item);
-    })
-    items.forEach(async item=>{
+    }
+    let errors = []
+    let savedItems = []
+        
+    console.log('Saving...');
+    for (let item of items) {
+            try {
+                await itemsRepository.save(item);
+                console.log('Saved')
+                savedItems.push(item)
+                } catch (error) {
+                errors.push(item.asin);
+            }
+            
+    }
+    console.log('Done');
 
-        await itemsRepository.save(item);
-    })
-    response.json(items);
+
+            
+        
+    response.json({ savedItems, errors, });
     
 })
 itemenxovalRouter.get('/',async (req,response)=>{
