@@ -13,6 +13,8 @@ export default class ItemEnxoval {
     name: string;
     @Column()
     imageUrl: string;
+    @Column({default: "https://amazon.com.br"})
+    productUrl: string;
     @Column({default: "-"})
     category: string;
     @Column()
